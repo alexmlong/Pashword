@@ -4,11 +4,49 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="Hello Alex, can you see me?"
-    android:id="@+id/text_view"
-    />
-</LinearLayout>
 
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="test"
+        android:maxLines="1"
+        android:id="@+id/message"
+        />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="test"
+        android:maxLines="1"
+        android:id="@+id/secret"
+        android:inputType="textPassword"
+        />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Hash!"
+        android:onClick="generate_and_show_hashes"
+        />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:maxLines="1"
+        android:id="@+id/color_int"
+        />
+
+    <View
+        android:id="@+id/totem"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:background="@drawable/rectangle"/>
+
+    <ListView
+        android:id="@+id/hashListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
+
+</LinearLayout>
