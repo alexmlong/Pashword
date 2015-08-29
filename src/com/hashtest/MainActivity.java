@@ -1,5 +1,8 @@
 package com.pashword;
 
+import android.database.Cursor;
+import android.content.ClipboardManager;
+import android.content.ClipData;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.app.Activity;
@@ -11,6 +14,8 @@ import java.util.ArrayList;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.view.View;
 import android.text.TextWatcher;
 import android.text.Editable;
@@ -71,6 +76,16 @@ public class MainActivity extends Activity
             ArrayAdapter<String> hashListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, hashes);
             ListView hashListView = (ListView)findViewById(R.id.hashListView);
             hashListView.setAdapter(hashListAdapter);
+            hashListView.setOnItemClickListener(new OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String selected_hash = (String) parent.getItemAtPosition(position);
+
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", selected_hash);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(MainActivity.this, "Hash copied to clipboard!", Toast.LENGTH_LONG).show();
+                }
+            });
         } catch (Exception e) {
             Toast.makeText(this, "error: " + e, Toast.LENGTH_LONG).show();
             System.out.println("ALEXLONG123 - error");
