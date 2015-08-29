@@ -3,6 +3,7 @@ package com.pashword;
 import android.database.Cursor;
 import android.content.ClipboardManager;
 import android.content.ClipData;
+import android.content.Context;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.app.Activity;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.text.TextWatcher;
 import android.text.Editable;
 import android.graphics.Color;
@@ -59,6 +61,10 @@ public class MainActivity extends Activity
     }
 
     public void generate_and_show_hashes(View v) throws Exception {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(secret_tv.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(message_tv.getWindowToken(), 0);
+
         try {
             String message = message_tv.getText().toString();
             String secret = secret_tv.getText().toString();
