@@ -1,6 +1,5 @@
 package com.pashword;
 
-import android.database.Cursor;
 import android.content.ClipboardManager;
 import android.content.ClipData;
 import android.content.Context;
