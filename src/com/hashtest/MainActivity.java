@@ -23,6 +23,9 @@ import android.text.TextWatcher;
 import android.text.Editable;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import java.security.NoSuchAlgorithmException;
+import java.security.InvalidKeyException;
+
 
 public class MainActivity extends Activity
 {
@@ -40,18 +43,7 @@ public class MainActivity extends Activity
 
             public void afterTextChanged(Editable s) {
                 String secret = secret_tv.getText().toString();
-                try {
-                    byte[] bytes = generate_hash("Pashword".getBytes(), secret);
-                    int color_int = Color.parseColor("#" + bytesToHex(bytes).substring(0, 6));
-                    ((TextView) findViewById(R.id.color_int)).setText("Color int: " + color_int);
-                    View totem_view = findViewById(R.id.totem);
-                    GradientDrawable totem_drawable = (GradientDrawable)totem_view.getBackground();
-                    totem_drawable.setColor(color_int);
-                } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "error: " + e, Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-                }
-
+                setHashTotem(secret);
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -60,7 +52,25 @@ public class MainActivity extends Activity
        });
     }
 
-    public void generate_and_show_hashes(View v) throws Exception {
+    private void setHashTotem(String secret) {
+        int color_int = 0;
+        if (secret.length() > 0) {
+            try {
+                byte[] bytes = generate_hash("Pashword".getBytes(), secret);
+            } catch (Exception e) {
+                // A lick and a promise
+            }
+            color_int = Color.parseColor("#" + bytesToHex(bytes).substring(0, 6));
+        } else {
+            color_int = Color.parseColor("#000000");
+        }
+        ((TextView) findViewById(R.id.color_int)).setText("Color int: " + color_int);
+        View totem_view = findViewById(R.id.totem);
+        GradientDrawable totem_drawable = (GradientDrawable)totem_view.getBackground();
+        totem_drawable.setColor(color_int);
+    }
+
+    public void generate_and_show_hashes(View v) {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(secret_tv.getWindowToken(), 0);
         imm.hideSoftInputFromWindow(message_tv.getWindowToken(), 0);
@@ -101,7 +111,7 @@ public class MainActivity extends Activity
         }
     }
 
-    public static byte[] generate_hash(byte[] message, String key) throws Exception {
+    public static byte[] generate_hash(byte[] message, String key) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
         SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(), "HmacSHA256");
         sha256_HMAC.init(secret_key);
