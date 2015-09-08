@@ -54,11 +54,16 @@ public class MainActivity extends Activity
 
     private void setHashTotem(String secret) {
         int color_int = 0;
+        byte[] bytes = null;
         if (secret.length() > 0) {
             try {
-                byte[] bytes = generate_hash("Pashword".getBytes(), secret);
-            } catch (Exception e) {
-                // A lick and a promise
+                bytes = generate_hash("Pashword".getBytes(), secret);
+            } catch (InvalidKeyException e) {
+                color_int = Color.parseColor("#000000");
+                Toast.makeText(MainActivity.this, "Invalid key", Toast.LENGTH_LONG).show();
+            } catch (NoSuchAlgorithmException e) {
+                color_int = Color.parseColor("#000000");
+                Toast.makeText(MainActivity.this, "Hash algorithm not found!", Toast.LENGTH_LONG).show();
             }
             color_int = Color.parseColor("#" + bytesToHex(bytes).substring(0, 6));
         } else {
@@ -75,39 +80,43 @@ public class MainActivity extends Activity
         imm.hideSoftInputFromWindow(secret_tv.getWindowToken(), 0);
         imm.hideSoftInputFromWindow(message_tv.getWindowToken(), 0);
 
-        try {
-            String message = message_tv.getText().toString();
-            String secret = secret_tv.getText().toString();
-            String hash = "";
+        String message = message_tv.getText().toString();
+        String secret = secret_tv.getText().toString();
+        String hash = "";
 
-            ArrayList<String> hashes = new ArrayList<String>();
-            byte[] bytes = generate_hash(message.getBytes(), secret);
+        ArrayList<String> hashes = new ArrayList<String>();
+        if (message.length() > 0 && secret.length() > 0) {
+            try {
+                byte[] bytes = generate_hash(message.getBytes(), secret);
 
-            for (int i = 0; i < 10; i++) {
-                bytes = generate_hash(bytes, secret);
-                hash = Base64.encodeToString(bytes, Base64.DEFAULT);
-                hashes.add(hash.substring(0, 10));
-            }
-
-            ArrayAdapter<String> hashListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, hashes);
-            ListView hashListView = (ListView)findViewById(R.id.hashListView);
-            hashListView.setAdapter(hashListAdapter);
-            hashListView.setOnItemClickListener(new OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String selected_hash = (String) parent.getItemAtPosition(position);
-
-                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", selected_hash);
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(MainActivity.this, "Hash copied to clipboard!", Toast.LENGTH_LONG).show();
+                for (int i = 0; i < 10; i++) {
+                    bytes = generate_hash(bytes, secret);
+                    hash = Base64.encodeToString(bytes, Base64.DEFAULT);
+                    hashes.add(hash.substring(0, 10));
                 }
-            });
-        } catch (Exception e) {
-            Toast.makeText(this, "error: " + e, Toast.LENGTH_LONG).show();
-            System.out.println("ALEXLONG123 - error");
-            System.out.println(e);
-            e.printStackTrace();
 
+                ArrayAdapter<String> hashListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, hashes);
+                ListView hashListView = (ListView) findViewById(R.id.hashListView);
+                hashListView.setAdapter(hashListAdapter);
+                hashListView.setOnItemClickListener(new OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String selected_hash = (String) parent.getItemAtPosition(position);
+
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", selected_hash);
+                        clipboard.setPrimaryClip(clip);
+                        Toast.makeText(MainActivity.this, "Hash copied to clipboard!", Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (InvalidKeyException e) {
+                Toast.makeText(MainActivity.this, "Invalid key", Toast.LENGTH_LONG).show();
+            } catch (NoSuchAlgorithmException e) {
+                Toast.makeText(MainActivity.this, "Hash algorithm not found!", Toast.LENGTH_LONG).show();
+            }
+        } else if (secret.length() < 1){
+            Toast.makeText(MainActivity.this, "Secret is empty!", Toast.LENGTH_LONG).show();
+        } else if (message.length() < 1){
+            Toast.makeText(MainActivity.this, "Key is empty!", Toast.LENGTH_LONG).show();
         }
     }
 
