@@ -3,7 +3,9 @@ package com.pashword;
 import android.content.ClipboardManager;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.app.Activity;
 import android.os.Bundle;
@@ -24,18 +26,32 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class MainActivity extends Activity
 {
-    EditText message_tv, secret_tv;
+    AutoCompleteTextView message_tv;
+    ArrayAdapter<String> message_tv_adapter;
+    Set<String> keys;
+    EditText secret_tv;
+    public static final String PashwordPrefs = "PashwordPrefs" ;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        message_tv = (EditText) findViewById(R.id.message);
+        message_tv = (AutoCompleteTextView) findViewById(R.id.message);
+
+        SharedPreferences prefs = getSharedPreferences(PashwordPrefs, MODE_PRIVATE);
+        keys = prefs.getStringSet("keys", new HashSet<String>());
+        String[] keys_array = keys.toArray(new String[keys.size()]);
+
+        message_tv_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, keys_array);
+        message_tv.setAdapter(message_tv_adapter);
+
         secret_tv = (EditText) findViewById(R.id.secret);
 
         secret_tv.addTextChangedListener(new TextWatcher() {
@@ -45,10 +61,12 @@ public class MainActivity extends Activity
                 setHashTotem(secret);
             }
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-       });
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
     }
 
     private void setHashTotem(String secret) {
@@ -107,6 +125,18 @@ public class MainActivity extends Activity
                         Toast.makeText(MainActivity.this, "Hash copied to clipboard!", Toast.LENGTH_LONG).show();
                     }
                 });
+
+
+                if (!keys.contains(message)) {
+                    message_tv_adapter.add(message);
+                }
+
+                keys.add(message);
+
+                SharedPreferences.Editor editor = getSharedPreferences(PashwordPrefs, MODE_PRIVATE).edit();
+                editor.putStringSet("keys", keys);
+                editor.commit();
+
             } catch (InvalidKeyException e) {
                 Toast.makeText(MainActivity.this, "Invalid key", Toast.LENGTH_LONG).show();
             } catch (NoSuchAlgorithmException e) {
